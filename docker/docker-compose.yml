@@ -12,7 +12,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: 123
 
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: urlencurtador
 
     ports:
