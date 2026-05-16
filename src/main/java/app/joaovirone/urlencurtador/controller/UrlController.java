@@ -2,6 +2,7 @@ package app.joaovirone.urlencurtador.controller;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpHeaders;
@@ -23,10 +24,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 @RestController
 @RequestMapping("/api/v1/URL_Encurtador")
 public class UrlController {
-
 
     private final UrlRepository repository;
 
@@ -45,28 +47,22 @@ public class UrlController {
 
        repository.save(new UrlEntity(id, request.url(), LocalDateTime.now().plusMinutes(1)));
 
-
-       var redirectUrl = serveletRequest.getRequestURL().toString().replace("encurtar-url", id);
-
+       var redirectUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+               .path("/{id}")
+               .buildAndExpand(id)
+               .toUriString();
 
         return ResponseEntity.ok(new UrlEncurtadaResponseDto(redirectUrl));
     }
     
-    @GetMapping("{id}")
-    public ResponseEntity<Void> redirect(@PathVariable("id") String id) {
-
-        var url = repository.findById(id);
-
-        if (url.isEmpty()){
-
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(url.get().getFullUrl()));
-
-        return ResponseEntity.status(HttpStatus.FOUND).headers(headers).build();
-
+    @GetMapping()
+    public ResponseEntity<List<UrlEntity>> listarTodasUrlsEncurtadas() {
+        
+        return ResponseEntity.ok(repository.findAll());
     }
+
+
+   
+    
     
 }
