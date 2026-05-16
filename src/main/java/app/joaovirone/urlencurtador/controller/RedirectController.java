@@ -1,6 +1,7 @@
 package app.joaovirone.urlencurtador.controller;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,10 @@ public class RedirectController {
 
         if (urlEntity.isEmpty()) {
             return ResponseEntity.notFound().build();
+        }
+
+        if (urlEntity.get().getExpiresAt().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.GONE).build(); 
         }
 
         HttpHeaders headers = new HttpHeaders();

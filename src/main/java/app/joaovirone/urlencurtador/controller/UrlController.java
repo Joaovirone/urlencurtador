@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/v1/URL_Encurtador")
+@RequestMapping("/api/v1/urls")
 public class UrlController {
 
     private final UrlRepository repository;
@@ -36,10 +36,14 @@ public class UrlController {
         this.repository = repository;
     }
 
-    @PostMapping("/encurtar-url")
+    @PostMapping()
     public ResponseEntity<UrlEncurtadaResponseDto> shortUrl(@RequestBody  UrlEncurtadaRequestDto request, HttpServletRequest serveletRequest) {
 
         String id;
+        String urlOriginal = request.url(); // ou request.fullUrl(), dependendo do seu DTO
+        if (!urlOriginal.startsWith("http://") && !urlOriginal.startsWith("https://")) {
+            urlOriginal = "https://" + urlOriginal;
+        }
 
        do { 
            id = RandomStringUtils.randomAlphanumeric(5,10);
